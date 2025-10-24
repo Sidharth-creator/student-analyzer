@@ -1,0 +1,3 @@
+@echo off
+echo Running Student Performance Analyzer...
+java -cp "classes;lib/*" academic.ui.StudentInfoDialog
