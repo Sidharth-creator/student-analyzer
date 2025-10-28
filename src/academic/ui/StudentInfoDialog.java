@@ -1,7 +1,7 @@
-package academic.ui;
+package ui;
 
-import academic.data.DataManager;
-import academic.models.ExamSession;
+import database.DataManager;
+import models.ExamSession;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,18 @@ public class StudentInfoDialog extends JDialog {
         super(owner, "Student Analyzer", true);
         dataManager = new DataManager();
         
-        // Set Nimbus L&F for this dialog as well
+        // **CRITICAL UPDATE: Initialize the database immediately**
+        try {
+            dataManager.initializeDatabase();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, 
+                "FATAL ERROR: Could not initialize database. Check if MySQL server is running and credentials are correct in DataManager.", 
+                "Database Connection Error", JOptionPane.ERROR_MESSAGE);
+            // Exit the application if the database cannot be initialized
+            System.exit(1);
+        }
+
+        // Set Nimbus L&F (Kept for consistency)
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -83,7 +94,11 @@ public class StudentInfoDialog extends JDialog {
 
         List<ExamSession> sessions = dataManager.getAllSessionsForStudent(studentId);
         if (sessions.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No records found for Student ID: " + studentId, "No Data", JOptionPane.INFORMATION_MESSAGE);
+            // Updated error message to hint at potential database issues
+            JOptionPane.showMessageDialog(this, 
+                "No records found for Student ID: " + studentId + 
+                "\n\n(If the student should exist, check the console for a database connection error.)", 
+                "No Data/Database Error", JOptionPane.INFORMATION_MESSAGE);
         } else {
             // Open the MainFrame with the data
             MainFrame mainFrame = new MainFrame(sessions);
@@ -93,7 +108,8 @@ public class StudentInfoDialog extends JDialog {
     }
 
     private void openAddExamDialog() {
-        AddExamDialog addExamDialog = new AddExamDialog(null); // Pass null as owner since main frame doesn't exist yet
+        // **FIX: Pass 'this' as the owner to correctly establish the dialog hierarchy**
+        AddExamDialog addExamDialog = new AddExamDialog(this); 
         addExamDialog.setVisible(true);
     }
     
