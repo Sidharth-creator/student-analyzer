@@ -1,6 +1,6 @@
-package academic.ui;
+package ui;
 
-import academic.models.ExamSession;
+import models.ExamSession;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
