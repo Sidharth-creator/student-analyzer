@@ -1,7 +1,7 @@
-package academic.ui;
+package ui;
 
-import academic.data.DataManager;
-import academic.models.ExamSession;
+import database.DataManager;
+import models.ExamSession;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,10 +15,10 @@ public class AddExamDialog extends JDialog {
     
     private DataManager dataManager;
 
-    public AddExamDialog(Frame owner) {
-        super(owner, "Add New Exam Session", true);
+    public AddExamDialog(StudentInfoDialog studentInfoDialog) {
+        super(studentInfoDialog, "Add New Exam Session", true);
         setSize(500, 400);
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(studentInfoDialog);
         setLayout(new BorderLayout(10, 10));
 
         dataManager = new DataManager();
