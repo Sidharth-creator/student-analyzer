@@ -1,6 +1,6 @@
-package academic.ui;
+package ui;
 
-import academic.models.ExamSession;
+import models.ExamSession;
 
 import javax.swing.*;
 import java.awt.*;
