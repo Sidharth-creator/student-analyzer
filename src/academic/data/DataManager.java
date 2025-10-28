@@ -1,4 +1,4 @@
-package database;
+package data;
 
 import models.ExamSession;
 import java.sql.*;

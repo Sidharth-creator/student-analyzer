@@ -1,6 +1,6 @@
 package ui;
 
-import database.DataManager;
+import data.DataManager;
 import models.ExamSession;
 
 import javax.swing.*;
