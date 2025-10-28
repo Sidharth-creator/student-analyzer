@@ -1,4 +1,4 @@
-package academic.models;
+package models;
 
 public class ExamSession {
 
