@@ -1,7 +1,7 @@
 package ui;
 
-import data.DataManager;
-import models.ExamSession;
+import database.DataManager;
+import models.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +12,7 @@ public class AddExamDialog extends JDialog {
     private JTextField subject1Field, sub1Int1Field, sub1Int2Field, sub1SemField;
     private JTextField subject2Field, sub2Int1Field, sub2Int2Field, sub2SemField;
     private JTextField subject3Field, sub3Int1Field, sub3Int2Field, sub3SemField;
-    
+
     private DataManager dataManager;
 
     public AddExamDialog(StudentInfoDialog studentInfoDialog) {
@@ -23,7 +23,6 @@ public class AddExamDialog extends JDialog {
 
         dataManager = new DataManager();
 
-        // Main form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -35,7 +34,7 @@ public class AddExamDialog extends JDialog {
         formPanel.add(new JLabel("Student ID:"));
         idField = new JTextField();
         formPanel.add(idField);
-        
+
         formPanel.add(new JLabel("Year:"));
         yearField = new JTextField();
         formPanel.add(yearField);
@@ -44,7 +43,6 @@ public class AddExamDialog extends JDialog {
         semesterField = new JTextField();
         formPanel.add(semesterField);
 
-        // Separator
         formPanel.add(new JSeparator());
         formPanel.add(new JSeparator());
 
@@ -62,10 +60,9 @@ public class AddExamDialog extends JDialog {
         sub1SemField = new JTextField();
         formPanel.add(sub1SemField);
 
-        // Separator
         formPanel.add(new JSeparator());
         formPanel.add(new JSeparator());
-        
+
         // Subject 2
         formPanel.add(new JLabel("Subject 2 Name:"));
         subject2Field = new JTextField();
@@ -80,7 +77,6 @@ public class AddExamDialog extends JDialog {
         sub2SemField = new JTextField();
         formPanel.add(sub2SemField);
 
-        // Separator
         formPanel.add(new JSeparator());
         formPanel.add(new JSeparator());
 
@@ -113,41 +109,105 @@ public class AddExamDialog extends JDialog {
     }
 
     private void saveStudent() {
-        // Basic validation
-        if (nameField.getText().trim().isEmpty() || idField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Student Name and ID cannot be empty.", "Validation Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
-            ExamSession student = new ExamSession(
-                nameField.getText().trim(),
-                idField.getText().trim(),
-                Integer.parseInt(yearField.getText().trim()),
-                Integer.parseInt(semesterField.getText().trim()),
-                subject1Field.getText().trim(),
-                Integer.parseInt(sub1Int1Field.getText().trim()),
-                Integer.parseInt(sub1Int2Field.getText().trim()),
-                Integer.parseInt(sub1SemField.getText().trim()),
-                subject2Field.getText().trim(),
-                Integer.parseInt(sub2Int1Field.getText().trim()),
-                Integer.parseInt(sub2Int2Field.getText().trim()),
-                Integer.parseInt(sub2SemField.getText().trim()),
-                subject3Field.getText().trim(),
-                Integer.parseInt(sub3Int1Field.getText().trim()),
-                Integer.parseInt(sub3Int2Field.getText().trim()),
-                Integer.parseInt(sub3SemField.getText().trim())
+            // Step 1: Validate Name
+            String name = nameField.getText().trim();
+            if (name.isEmpty()) throw new ValidationException("Student Name cannot be empty.");
+            if (!ExamSessionValidation.isValidName(name))
+                throw new ValidationException("Invalid Name: only letters and spaces allowed.");
+
+            // Step 2: Validate ID
+            String id = idField.getText().trim();
+            if (id.isEmpty()) throw new ValidationException("Student ID cannot be empty.");
+
+            // Step 3: Parse numeric fields individually and validate ranges
+            int year = parseInteger(yearField.getText(), "Year");
+            if (!ExamSessionValidation.isValidYear(year))
+                throw new ValidationException("Invalid Year: must be between 1 and 4.");
+
+            int semester = parseInteger(semesterField.getText(), "Semester");
+            if (!ExamSessionValidation.isValidSemester(semester))
+                throw new ValidationException("Invalid Semester: must be between 1 and 8.");
+
+            int sub1Int1 = parseInteger(sub1Int1Field.getText(), "Subject 1 Internal 1");
+            if (!ExamSessionValidation.isValidInternalMark(sub1Int1))
+                throw new ValidationException("Subject 1 Internal 1 must be between 0 and 40.");
+
+            int sub1Int2 = parseInteger(sub1Int2Field.getText(), "Subject 1 Internal 2");
+            if (!ExamSessionValidation.isValidInternalMark(sub1Int2))
+                throw new ValidationException("Subject 1 Internal 2 must be between 0 and 40.");
+
+            int sub1Sem = parseInteger(sub1SemField.getText(), "Subject 1 Semester");
+            if (!ExamSessionValidation.isValidSemMark(sub1Sem))
+                throw new ValidationException("Subject 1 Semester marks must be between 0 and 60.");
+
+            int sub2Int1 = parseInteger(sub2Int1Field.getText(), "Subject 2 Internal 1");
+            if (!ExamSessionValidation.isValidInternalMark(sub2Int1))
+                throw new ValidationException("Subject 2 Internal 1 must be between 0 and 40.");
+
+            int sub2Int2 = parseInteger(sub2Int2Field.getText(), "Subject 2 Internal 2");
+            if (!ExamSessionValidation.isValidInternalMark(sub2Int2))
+                throw new ValidationException("Subject 2 Internal 2 must be between 0 and 40.");
+
+            int sub2Sem = parseInteger(sub2SemField.getText(), "Subject 2 Semester");
+            if (!ExamSessionValidation.isValidSemMark(sub2Sem))
+                throw new ValidationException("Subject 2 Semester marks must be between 0 and 60.");
+
+            int sub3Int1 = parseInteger(sub3Int1Field.getText(), "Subject 3 Internal 1");
+            if (!ExamSessionValidation.isValidInternalMark(sub3Int1))
+                throw new ValidationException("Subject 3 Internal 1 must be between 0 and 40.");
+
+            int sub3Int2 = parseInteger(sub3Int2Field.getText(), "Subject 3 Internal 2");
+            if (!ExamSessionValidation.isValidInternalMark(sub3Int2))
+                throw new ValidationException("Subject 3 Internal 2 must be between 0 and 40.");
+
+            int sub3Sem = parseInteger(sub3SemField.getText(), "Subject 3 Semester");
+            if (!ExamSessionValidation.isValidSemMark(sub3Sem))
+                throw new ValidationException("Subject 3 Semester marks must be between 0 and 60.");
+
+            // Step 4: Build ExamSession object
+            ExamSession exam = new ExamSession(
+                    name, id, year, semester,
+                    subject1Field.getText().trim(), sub1Int1, sub1Int2, sub1Sem,
+                    subject2Field.getText().trim(), sub2Int1, sub2Int2, sub2Sem,
+                    subject3Field.getText().trim(), sub3Int1, sub3Int2, sub3Sem
             );
 
-            if (dataManager.addExamSession(student)) {
+            // Step 5: Centralized validation for safety
+            String validationMessage = ExamSessionValidation.getValidationMessage(exam);
+            if (validationMessage != null)
+                throw new ValidationException(validationMessage);
+
+            // Step 6: Save to DB
+            if (dataManager.addExamSession(exam)) {
                 JOptionPane.showMessageDialog(this, "Exam Session added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                dispose(); // Close the dialog
+                dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to add student. Check console for errors.", "Database Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Failed to add exam session. Check console for details.", "Database Error", JOptionPane.ERROR_MESSAGE);
             }
+
+        } catch (ValidationException ve) {
+            JOptionPane.showMessageDialog(this, ve.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Helper — throws ValidationException to stop immediately
+    private int parseInteger(String text, String fieldName) {
+        if (text.trim().isEmpty())
+            throw new ValidationException(fieldName + " cannot be empty.");
+        try {
+            return Integer.parseInt(text.trim());
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numbers for year, semester, and marks.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            throw new ValidationException(fieldName + " must be a valid number.");
+        }
+    }
+
+    // Custom runtime exception for immediate validation stops
+    private static class ValidationException extends RuntimeException {
+        public ValidationException(String message) {
+            super(message);
         }
     }
 }
-
