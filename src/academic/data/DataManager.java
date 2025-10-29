@@ -1,4 +1,4 @@
-package data;
+package database;
 
 import models.ExamSession;
 import java.sql.*;
@@ -73,6 +73,47 @@ public class DataManager {
             System.out.println("Table 'marks' verified/created successfully.");
         }
     }
+
+    // New method to get the latest session for every student (for Admin View)
+    public List<ExamSession> getAllLatestSessions() {
+        List<ExamSession> sessions = new ArrayList<>();
+        String sql = "SELECT m1.* " +
+                     "FROM marks m1 " +
+                     "LEFT JOIN marks m2 ON m1.student_id = m2.student_id AND " +
+                     "    (m1.year < m2.year OR (m1.year = m2.year AND m1.semester < m2.semester)) " +
+                     "WHERE m2.id IS NULL " +
+                     "ORDER BY m1.student_id, m1.year DESC, m1.semester DESC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                sessions.add(new ExamSession(
+                    rs.getString("name"),
+                    rs.getString("student_id"),
+                    rs.getInt("year"),
+                    rs.getInt("semester"),
+                    rs.getString("subject1"),
+                    rs.getInt("sub1_internal1"),
+                    rs.getInt("sub1_internal2"),
+                    rs.getInt("sub1_sem"),
+                    rs.getString("subject2"),
+                    rs.getInt("sub2_internal1"),
+                    rs.getInt("sub2_internal2"),
+                    rs.getInt("sub2_sem"),
+                    rs.getString("subject3"),
+                    rs.getInt("sub3_internal1"),
+                    rs.getInt("sub3_internal2"),
+                    rs.getInt("sub3_sem")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sessions;
+    }
+    
     public ExamSession getLatestSessionForStudent(String studentId) {
         ExamSession student = null;
         String sql = "SELECT * FROM marks WHERE student_id = ? ORDER BY year DESC, semester DESC LIMIT 1";
