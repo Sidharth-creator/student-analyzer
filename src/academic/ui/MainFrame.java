@@ -1,6 +1,6 @@
 package ui;
 
-import models.ExamSession;
+import models.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +14,7 @@ public class MainFrame extends JFrame {
     public MainFrame(List<ExamSession> sessions) {
         setTitle("Student Performance Analyzer");
         setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Changed from EXIT_ON_CLOSE
         setLocationRelativeTo(null);
 
         // Set Nimbus L&F
@@ -63,13 +63,13 @@ public class MainFrame extends JFrame {
         
         // Bottom button panel
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
+        JButton closeButton = new JButton("Logout");
         bottomPanel.add(closeButton);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         closeButton.addActionListener(e -> {
             this.dispose();
-            // Re-open the initial dialog
+            // Re-open the initial dialog (The main entry point)
             StudentInfoDialog.main(null);
         });
     }
