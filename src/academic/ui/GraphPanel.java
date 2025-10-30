@@ -132,7 +132,7 @@ public class GraphPanel extends JPanel {
                 dataset.addValue(session.getSub1Total(), session.getSubject1() + " (Total)", xAxisLabel);
                 dataset.addValue(session.getSub2Total(), session.getSubject2() + " (Total)", xAxisLabel);
                 dataset.addValue(session.getSub3Total(), session.getSubject3() + " (Total)", xAxisLabel);
-                dataset.addValue(session.getsgpa() * 14, "SGPA (×14)", xAxisLabel);
+                dataset.addValue(session.getsgpa() * 14, "SGPA (×14)", xAxisLabel); // SGPA scaled for visual comparison
             }
             chart = createBarChart(dataset, chartTitle, "Exam Session (Year-Semester)");
         } else { // A specific subject is selected
