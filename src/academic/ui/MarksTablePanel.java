@@ -71,7 +71,6 @@ public class MarksTablePanel extends JPanel {
     
     private void addSubjectData(Vector<Vector<Object>> data, ExamSession s, String subName, 
                                 int int1, int int2, int sem, String filter) {
-        int marks = 0;
         boolean all = "All".equals(filter);
         if (all || "Internal 1".equals(filter)) data.add(createRow(s, subName, "Internal 1", int1));
         if (all || "Internal 2".equals(filter)) data.add(createRow(s, subName, "Internal 2", int2));
