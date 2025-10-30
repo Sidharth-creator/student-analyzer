@@ -1,6 +1,6 @@
 package ui;
 
-import data.DataManager;
+import database.DataManager;
 import models.ExamSession;
 
 import javax.swing.*;
@@ -15,7 +15,7 @@ public class StudentInfoDialog extends JDialog {
         super(owner, "Student Analyzer", true);
         dataManager = new DataManager();
         
-        // **CRITICAL UPDATE: Initialize the database immediately**
+        // CRITICAL UPDATE: Initialize the database immediately
         try {
             dataManager.initializeDatabase();
         } catch (Exception e) {
@@ -39,7 +39,8 @@ public class StudentInfoDialog extends JDialog {
         }
 
         setTitle("Student Performance Analyzer");
-        setSize(400, 150);
+        // Increased width for four buttons
+        setSize(550, 150); 
         setLocationRelativeTo(owner);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         
@@ -56,8 +57,9 @@ public class StudentInfoDialog extends JDialog {
         // Label
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panel.add(new JLabel("Enter Student ID to Analyze or Add New Session:"), gbc);
+        // Increased width to 4 for the label
+        gbc.gridwidth = 4; 
+        panel.add(new JLabel("Enter Student ID to Analyze, Add New Session, or use Admin Login:"), gbc);
 
         // Text Field
         gbc.gridy = 1;
@@ -65,23 +67,30 @@ public class StudentInfoDialog extends JDialog {
         panel.add(studentIdField, gbc);
 
         // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton analyzeButton = new JButton("Analyze");
-        JButton addButton = new JButton("Add Exam Session");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton analyzeButton = new JButton("Login");
+        // *** RE-ADDED BUTTON ***
+        JButton addExamButton = new JButton("Add Exam Session"); 
+        JButton adminLoginButton = new JButton("Admin Login"); 
         JButton quitButton = new JButton("Quit");
+        
         buttonPanel.add(analyzeButton);
-        buttonPanel.add(addButton);
+        buttonPanel.add(addExamButton); // Added Add Exam Session button
+        buttonPanel.add(adminLoginButton); 
         buttonPanel.add(quitButton);
         
         gbc.gridy = 2;
-        gbc.gridwidth = 2;
+        // Increased width to 4 for the button panel
+        gbc.gridwidth = 4; 
         panel.add(buttonPanel, gbc);
 
         add(panel, BorderLayout.CENTER);
 
         // --- Action Listeners ---
         analyzeButton.addActionListener(e -> analyzeStudent());
-        addButton.addActionListener(e -> openAddExamDialog());
+        // *** ADDED LISTENER ***
+        addExamButton.addActionListener(e -> openAddExamDialog()); 
+        adminLoginButton.addActionListener(e -> openAdminLogin()); 
         quitButton.addActionListener(e -> System.exit(0));
     }
 
@@ -94,7 +103,6 @@ public class StudentInfoDialog extends JDialog {
 
         List<ExamSession> sessions = dataManager.getAllSessionsForStudent(studentId);
         if (sessions.isEmpty()) {
-            // Updated error message to hint at potential database issues
             JOptionPane.showMessageDialog(this, 
                 "No records found for Student ID: " + studentId + 
                 "\n\n(If the student should exist, check the console for a database connection error.)", 
@@ -107,10 +115,16 @@ public class StudentInfoDialog extends JDialog {
         }
     }
 
-    private void openAddExamDialog() {
-        // **FIX: Pass 'this' as the owner to correctly establish the dialog hierarchy**
+    // This method is now used by the Add Exam button listener directly
+    public void openAddExamDialog() {
         AddExamDialog addExamDialog = new AddExamDialog(this); 
         addExamDialog.setVisible(true);
+    }
+    
+    // NEW METHOD: Opens the Admin Login dialog
+    private void openAdminLogin() {
+        AdminLoginDialog adminDialog = new AdminLoginDialog(this, dataManager);
+        adminDialog.setVisible(true);
     }
     
     public static void main(String[] args) {
